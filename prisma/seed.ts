@@ -126,7 +126,7 @@ async function seedDatabase() {
         },
       });
 
-      services.forEach(async (service) => {
+      for (const service of services) {
         await prisma.barbershopService.create({
           data: {
             name: service.name,
@@ -140,7 +140,7 @@ async function seedDatabase() {
             imageUrl: service.imageUrl,
           },
         });
-      });
+      }
 
       barbershops.push(barbershop);
     }

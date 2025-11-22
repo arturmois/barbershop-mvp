@@ -14,7 +14,7 @@ const BarbershopItem = ({ barbershop }: BarbershopItemProps) => {
     >
       <div className="absolute top-0 left-0 z-10 h-full w-full rounded-lg bg-linear-to-t from-black to-transparent" />
       <Image
-        src={barbershop.image_url}
+        src={barbershop.imageUrl}
         alt={barbershop.name}
         fill
         className="rounded-xl object-cover"

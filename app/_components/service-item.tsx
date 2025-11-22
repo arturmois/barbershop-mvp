@@ -19,7 +19,7 @@ const ServiceItem = ({ service }: ServiceItemProps) => {
     <div className="border-border bg-card flex w-full items-center gap-3 rounded-2xl border p-3">
       <div className="relative size-[110px] shrink-0 overflow-hidden rounded-[10px]">
         <Image
-          src={service.image_url}
+          src={service.imageUrl}
           alt={service.name}
           fill
           className="object-cover"
@@ -36,7 +36,7 @@ const ServiceItem = ({ service }: ServiceItemProps) => {
         </div>
         <div className="flex items-center justify-between">
           <p className="text-card-foreground text-sm leading-[1.4] font-bold">
-            {formatPrice(service.price_in_cents)}
+            {formatPrice(service.priceInCents)}
           </p>
           <Button size="sm" className="rounded-full px-4 py-2">
             Reservar

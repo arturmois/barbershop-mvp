@@ -26,7 +26,7 @@ const BarbershopPage = async (props: PageProps<"/barbershops/[id]">) => {
     <main className="bg-background flex min-h-screen flex-col">
       <div className="relative h-[297px] w-full">
         <Image
-          src={barbershop.image_url}
+          src={barbershop.imageUrl}
           alt={barbershop.name}
           fill
           className="object-cover"
@@ -49,7 +49,7 @@ const BarbershopPage = async (props: PageProps<"/barbershops/[id]">) => {
         <div className="flex items-center gap-[5px] px-5 pt-6">
           <div className="relative size-[30px] shrink-0 overflow-hidden rounded-full">
             <Image
-              src={barbershop.image_url}
+              src={barbershop.imageUrl}
               alt={barbershop.name}
               fill
               className="object-cover"

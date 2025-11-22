@@ -19,6 +19,7 @@ const Home = async () => {
       createdAt: "desc",
     },
   });
+  console.log(recommendedBarbershops);
   const popularBarbershops = await prisma.barbershop.findMany({
     orderBy: {
       createdAt: "asc",
