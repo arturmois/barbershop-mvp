@@ -12,45 +12,108 @@ model Barbershop {
   name        String
   address     String
   description String
-  image_url   String
+  imageUrl    String
   phones      String[]
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   services BarbershopService[]
   bookings Booking[]
 
-  @@map("barbershops")
+  @@map("barbershop")
 }
 
 model BarbershopService {
-  id             String   @id @default(uuid())
-  barbershop_id  String
-  name           String
-  description    String
-  image_url      String
-  price_in_cents Int
-  created_at     DateTime @default(now())
-  updated_at     DateTime @updatedAt
+  id           String   @id @default(uuid())
+  barbershopId String
+  name         String
+  description  String
+  imageUrl     String
+  priceInCents Int
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  barbershop Barbershop @relation(fields: [barbershop_id], references: [id])
+  barbershop Barbershop @relation(fields: [barbershopId], references: [id])
   bookings   Booking[]
 
-  @@map("barbershop_services")
+  @@map("barbershop_service")
 }
 
 model Booking {
-  id            String    @id @default(uuid())
-  service_id    String
-  barbershop_id String
-  date          DateTime  @db.Timestamptz
-  cancelled     Boolean   @default(false)
-  cancelled_at  DateTime? @db.Timestamptz
-  created_at    DateTime  @default(now())
-  updated_at    DateTime  @updatedAt
+  id           String    @id @default(uuid())
+  serviceId    String
+  barbershopId String
+  date         DateTime  @db.Timestamptz
+  cancelled    Boolean   @default(false)
+  cancelledAt  DateTime? @db.Timestamptz
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
-  service    BarbershopService @relation(fields: [service_id], references: [id])
-  barbershop Barbershop        @relation(fields: [barbershop_id], references: [id])
+  service    BarbershopService @relation(fields: [serviceId], references: [id])
+  barbershop Barbershop        @relation(fields: [barbershopId], references: [id])
 
-  @@map("bookings")
+  @@map("booking")
+}
+
+model User {
+  id            String    @id
+  name          String
+  email         String
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+
+  @@unique([email])
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
 }

@@ -16,12 +16,12 @@ import {
 const Home = async () => {
   const recommendedBarbershops = await prisma.barbershop.findMany({
     orderBy: {
-      created_at: "desc",
+      createdAt: "desc",
     },
   });
   const popularBarbershops = await prisma.barbershop.findMany({
     orderBy: {
-      created_at: "asc",
+      createdAt: "asc",
     },
   });
   return (
