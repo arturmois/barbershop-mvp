@@ -38,10 +38,23 @@ const Home = async () => {
         <PageSection>
           <PageSectionTitle>Agendamentos</PageSectionTitle>
           <BookingItem
-            serviceName="Corte de Cabelo"
-            barberShopName="Barbearia do João"
-            barberShopImageUrl="https://utfs.io/f/c97a2dc9-cf62-468b-a851-bfd2bdde775f-16p.png"
-            date={new Date("2025-01-01")}
+            booking={{
+              barbershop: {
+                id: "1",
+                name: "Barbearia do João",
+                imageUrl:
+                  "https://utfs.io/f/c97a2dc9-cf62-468b-a851-bfd2bdde775f-16p.png",
+                address: "Rua do João, 123",
+                phones: ["(11) 99999-9999"],
+              },
+              id: "1",
+              date: new Date(),
+              cancelled: false,
+              service: {
+                name: "Corte de Cabelo",
+                priceInCents: 10000,
+              },
+            }}
           />
         </PageSection>
         <PageSection>
