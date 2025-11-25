@@ -19,28 +19,8 @@ import { useState } from "react";
 import { createBooking } from "../_actions/create-booking";
 import { useAction } from "next-safe-action/hooks";
 import { toast } from "sonner";
-
-const timeSlots = [
-  "09:00",
-  "09:30",
-  "10:00",
-  "10:30",
-  "11:00",
-  "11:30",
-  "12:00",
-  "12:30",
-  "13:00",
-  "13:30",
-  "14:00",
-  "14:30",
-  "15:00",
-  "15:30",
-  "16:00",
-  "16:30",
-  "17:00",
-  "17:30",
-  "18:00",
-];
+import { getDateAvailableTimeSlots } from "../_actions/get-date-available-time-slots.";
+import { useQuery } from "@tanstack/react-query";
 
 interface ServiceItemProps {
   service: BarbershopService;
@@ -52,8 +32,21 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
   const [selectedTime, setSelectedTime] = useState<string | undefined>(
     undefined,
   );
-  const [sheetOpen, setSheetOpen] = useState(false);
   const { executeAsync, isPending } = useAction(createBooking);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const { data: availableTimeSlots } = useQuery({
+    queryKey: ["date-available-time-slots", service.barbershopId, selectedDate],
+    queryFn: () =>
+      getDateAvailableTimeSlots({
+        barbershopId: service.barbershopId,
+        date: selectedDate!,
+      }),
+    enabled: Boolean(selectedDate),
+  });
+
+  const handleDateSelect = (date: Date | undefined) => {
+    setSelectedDate(date);
+  };
 
   const formatPrice = (priceInCents: number) => {
     const price = priceInCents / 100;
@@ -71,7 +64,7 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat("pt-BR", {
       day: "2-digit",
-      month: "long",
+      month: "short",
     }).format(date);
   };
 
@@ -136,7 +129,7 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
                   <Calendar
                     mode="single"
                     selected={selectedDate}
-                    onSelect={setSelectedDate}
+                    onSelect={handleDateSelect}
                     className="w-full"
                   />
                 </div>
@@ -146,7 +139,7 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
                     <Separator />
                     <div className="flex flex-col gap-3">
                       <div className="flex gap-3 overflow-x-auto [&::-webkit-scrollbar]:hidden">
-                        {timeSlots.map((time) => (
+                        {availableTimeSlots?.data?.map((time) => (
                           <Button
                             key={time}
                             variant={
