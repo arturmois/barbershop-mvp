@@ -1,6 +1,5 @@
-import { PrismaClient, Prisma } from "../app/generated/prisma/client";
+import { PrismaClient } from "../app/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
-import "dotenv/config";
 
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL,
@@ -145,6 +144,7 @@ async function seedDatabase() {
       barbershops.push(barbershop);
     }
 
+    // Fechar a conexão com o banco de dados
     await prisma.$disconnect();
   } catch (error) {
     console.error("Erro ao criar as barbearias:", error);

@@ -14,20 +14,10 @@ import {
 import { useState } from "react";
 import Image from "next/image";
 import { Button } from "./ui/button";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "./ui/alert-dialog";
-
-import type { Booking } from "@/app/generated/prisma/client";
-import PhoneItem from "./phone-item";
+import { useAction } from "next-safe-action/hooks";
+import { cancelBooking } from "../_actions/cancel-booking";
+import { toast } from "sonner";
+import { PhoneItem } from "./phone-item";
 
 interface BookingItemProps {
   booking: {
@@ -48,22 +38,29 @@ interface BookingItemProps {
   };
 }
 
-const getStatus = (booking: Pick<Booking, "date" | "cancelled">) => {
-  if (booking.cancelled) {
-    return "cancelled";
-  }
-  const date = new Date(booking.date);
-  const now = new Date();
-  return date >= now ? "confirmed" : "finished";
-};
-
 const BookingItem = ({ booking }: BookingItemProps) => {
   const [sheetIsOpen, setSheetIsOpen] = useState(false);
 
-  const handleCancelBooking = () => {};
+  const { execute: executeCancelBooking } = useAction(cancelBooking, {
+    onSuccess: () => {
+      toast.success("Reserva cancelada com sucesso!");
+      setSheetIsOpen(false);
+    },
+    onError: ({ error }) => {
+      toast.error(
+        error.serverError || "Erro ao cancelar reserva. Tente novamente.",
+      );
+    },
+  });
 
+  const handleCancelBooking = () => {
+    executeCancelBooking({ bookingId: booking.id });
+  };
+
+  const date = new Date(booking.date);
   const now = new Date();
-  const isConfirmed = !booking.cancelled && new Date(booking.date) >= now;
+  const status = !booking.cancelled && date >= now ? "confirmed" : "finished";
+  const isConfirmed = status === "confirmed";
 
   return (
     <Sheet open={sheetIsOpen} onOpenChange={setSheetIsOpen}>
@@ -72,16 +69,12 @@ const BookingItem = ({ booking }: BookingItemProps) => {
           <div className="flex flex-1 flex-col gap-4 p-4">
             <Badge
               className={
-                isConfirmed
+                status === "confirmed"
                   ? "bg-primary/10 text-primary uppercase"
                   : "bg-muted text-muted-foreground uppercase"
               }
             >
-              {isConfirmed
-                ? "Confirmado"
-                : !booking.cancelled
-                  ? "Finalizado"
-                  : "Cancelado"}
+              {status === "confirmed" ? "Confirmado" : "Finalizado"}
             </Badge>
 
             <div className="flex flex-col gap-2">
@@ -97,13 +90,13 @@ const BookingItem = ({ booking }: BookingItemProps) => {
 
           <div className="flex h-full w-[106px] flex-col items-center justify-center border-l py-3">
             <p className="text-xs capitalize">
-              {booking.date.toLocaleDateString("pt-BR", { month: "long" })}
+              {date.toLocaleDateString("pt-BR", { month: "long" })}
             </p>
             <p className="text-2xl">
-              {booking.date.toLocaleDateString("pt-BR", { day: "2-digit" })}
+              {date.toLocaleDateString("pt-BR", { day: "2-digit" })}
             </p>
             <p className="text-xs">
-              {booking.date.toLocaleTimeString("pt-BR", {
+              {date.toLocaleTimeString("pt-BR", {
                 hour: "2-digit",
                 minute: "2-digit",
               })}
@@ -168,7 +161,7 @@ const BookingItem = ({ booking }: BookingItemProps) => {
             <div className="text-muted-foreground flex items-center justify-between text-sm">
               <p>Data</p>
               <p>
-                {booking.date.toLocaleDateString("pt-BR", {
+                {date.toLocaleDateString("pt-BR", {
                   day: "2-digit",
                   month: "long",
                 })}
@@ -177,7 +170,7 @@ const BookingItem = ({ booking }: BookingItemProps) => {
             <div className="text-muted-foreground flex items-center justify-between text-sm">
               <p>Horário</p>
               <p>
-                {booking.date.toLocaleTimeString("pt-BR", {
+                {date.toLocaleTimeString("pt-BR", {
                   hour: "2-digit",
                   minute: "2-digit",
                 })}
@@ -209,31 +202,13 @@ const BookingItem = ({ booking }: BookingItemProps) => {
             Voltar
           </Button>
           {isConfirmed && (
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="destructive" className="flex-1 rounded-full">
-                  Cancelar Reserva
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Cancelar reserva</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Tem certeza que deseja cancelar esta reserva? Esta ação não
-                    pode ser desfeita.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Voltar</AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={handleCancelBooking}
-                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                  >
-                    Confirmar
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+            <Button
+              variant="destructive"
+              className="flex-1 rounded-full"
+              onClick={handleCancelBooking}
+            >
+              Cancelar Reserva
+            </Button>
           )}
         </div>
       </SheetContent>

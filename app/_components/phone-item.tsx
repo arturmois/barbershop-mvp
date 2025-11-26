@@ -34,4 +34,4 @@ const PhoneItem = ({ phone }: PhoneItemProps) => {
   );
 };
 
-export default PhoneItem;
+export { PhoneItem };

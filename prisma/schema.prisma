@@ -8,53 +8,38 @@ datasource db {
 }
 
 model Barbershop {
-  id          String   @id @default(uuid())
+  id          String              @id @default(uuid())
   name        String
   address     String
   description String
   imageUrl    String
   phones      String[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  services BarbershopService[]
-  bookings Booking[]
-
-  @@map("barbershop")
+  services    BarbershopService[]
+  bookings    Booking[]
 }
 
 model BarbershopService {
-  id           String   @id @default(uuid())
-  barbershopId String
+  id           String     @id @default(uuid())
   name         String
   description  String
   imageUrl     String
+  barbershopId String
+  barbershop   Barbershop @relation(fields: [barbershopId], references: [id])
   priceInCents Int
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  barbershop Barbershop @relation(fields: [barbershopId], references: [id])
-  bookings   Booking[]
-
-  @@map("barbershop_service")
+  bookings     Booking[]
 }
 
 model Booking {
-  id           String    @id @default(uuid())
+  id           String            @id @default(uuid())
   serviceId    String
+  service      BarbershopService @relation(fields: [serviceId], references: [id])
   barbershopId String
+  barbershop   Barbershop        @relation(fields: [barbershopId], references: [id])
   userId       String
-  date         DateTime  @db.Timestamptz
-  cancelled    Boolean   @default(false)
-  cancelledAt  DateTime? @db.Timestamptz
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-
-  service    BarbershopService @relation(fields: [serviceId], references: [id])
-  barbershop Barbershop        @relation(fields: [barbershopId], references: [id])
-  user       User              @relation(fields: [userId], references: [id])
-
-  @@map("booking")
+  user         User              @relation(fields: [userId], references: [id])
+  date         DateTime          @db.Timestamptz
+  cancelled    Boolean?          @default(false)
+  cancelledAt  DateTime?         @db.Timestamptz
 }
 
 model User {
@@ -64,7 +49,7 @@ model User {
   emailVerified Boolean   @default(false)
   image         String?
   createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  updatedAt     DateTime  @default(now()) @updatedAt
   sessions      Session[]
   accounts      Account[]
   bookings      Booking[]
@@ -85,7 +70,6 @@ model Session {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([token])
-  @@index([userId])
   @@map("session")
 }
 
@@ -105,7 +89,6 @@ model Account {
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
 
-  @@index([userId])
   @@map("account")
 }
 
@@ -115,8 +98,7 @@ model Verification {
   value      String
   expiresAt  DateTime
   createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  updatedAt  DateTime @default(now()) @updatedAt
 
-  @@index([identifier])
   @@map("verification")
 }

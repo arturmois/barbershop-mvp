@@ -6,7 +6,7 @@ import { Button } from "@/app/_components/ui/button";
 import { ChevronLeftIcon } from "lucide-react";
 import { Separator } from "@/app/_components/ui/separator";
 import ServiceItem from "@/app/_components/service-item";
-import PhoneItem from "@/app/_components/phone-item";
+import { PhoneItem } from "@/app/_components/phone-item";
 import Footer from "@/app/_components/footer";
 
 const BarbershopPage = async (props: PageProps<"/barbershops/[id]">) => {
